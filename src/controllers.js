@@ -12,25 +12,29 @@ const setTokenCookie = (request, response) => {
     })
 }
 
-const isUserExists = async (request) => {
-    const existingUser = await db.getUserByMail(request.body.mail)
-    return !!existingUser
-}
-
 const createUser = async (request) => {
     const {name, mail, password} = request.body
     const passwordHash = hashPassword(password)
     await db.createUser({name, mail, passwordHash})
 }
 
-const signup = async (request, response) => {
-    if (await isUserExists(request)) {
-        response.status(409).end()
-        return
+const handleSignupError = (error, response) => {
+    if (error.code = '23505') {
+        response.status(409)
+        response.send('This mail is already in use')
+    } else {
+        response.status(500)
     }
-    createUser(request)
-    setTokenCookie(request, response)
-    response.status(200).end()
+}
+
+const signup = async (request, response) => {
+    try {
+        await createUser(request)
+        setTokenCookie(request, response)
+        response.status(200).end()
+    } catch (e) {
+        handleSignupError(e, response)
+    }
 }
 
 const validateUser = async (request) => {
@@ -50,48 +54,24 @@ const login = async (request, response) => {
     }
 }
 
-const isAuthorized = async (request) => {
-    const token = request.cookies.token
-    if (!token) return false
-    const mail = jwt.verify(token, secretKey)
-    const user = await db.getUserByMail(mail)
-    return user && !user.isBlocked
-}
-
 const getUsers = async (request, response) => {
-    if (!await isAuthorized(request)) {
-        response.status(403).end()
-        return
-    }
     const users = await db.getUsers()
     response.status(200).json(users)
 }
 
 const blockUsers = async (request, response) => {
-    if (!await isAuthorized(request)) {
-        response.status(403).end()
-        return
-    }
     const userIds = request.body
     await db.blockUsers(userIds)
     response.status(200).end()
 }
 
 const unblockUsers = async (request, response) => {
-    if (!await isAuthorized(request)) {
-        response.status(403).end()
-        return
-    }
     const userIds = request.body
     await db.unblockUsers(userIds)
     response.status(200).end()
 }
 
 const deleteUsers = async (request, response) => {
-    if (!await isAuthorized(request)) {
-        response.status(403).end()
-        return
-    }
     const userIds = request.body
     await db.deleteUsers(userIds)
     response.status(200).end()

@@ -5,6 +5,7 @@ import bodyParser from 'body-parser'
 import router from './src/router.js'
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
+import { jwtMiddleware } from './src/jwtMiddleware.js'
 
 const port = 4000
 const app = express()
@@ -28,6 +29,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }))
 
+app.use('/protected*', jwtMiddleware)
 app.use(router)
 
 app.listen(port, () => {
