@@ -13,7 +13,8 @@ const isAuthorized = async (request) => {
 
 export const jwtMiddleware = async (request, response, next) => {
     if (!await isAuthorized(request)) {
-        response.status(403).end()
+        response.status(403)
+        response.send('You can\'t access this data. Your account is blocked or deleted')
         return
     }
     next()

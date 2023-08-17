@@ -44,13 +44,18 @@ const validateUser = async (request) => {
     return user && (user.passwordHash === passwordHash) && !user.isBlocked
 }
 
+const handleLoginError = (response) => {
+    response.status(403)
+    response.send('Invalid credentials. Your account is probably blocked or deleted')
+}
+
 const login = async (request, response) => {
     const isValid = await validateUser(request)
     if (isValid) {
         setTokenCookie(request, response)
         response.status(200).end()
     } else {
-        response.status(403).end()
+        handleLoginError(response)
     }
 }
 
