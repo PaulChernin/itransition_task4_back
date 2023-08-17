@@ -20,14 +20,9 @@ const createUser = async ({name, mail, passwordHash}) => {
     await pool.query(sql, [name, mail, passwordHash])
 }
 
-const blockUsers = async (userIds) => {
-    const sql = `UPDATE ${dbName} SET "isBlocked" = true WHERE id in (${userIds.join(',')});`
-    await pool.query(sql)
-}
-
-const unblockUsers = async (userIds) => {
-    const sql = `UPDATE ${dbName} SET "isBlocked" = false WHERE id in (${userIds.join(',')});`
-    await pool.query(sql)
+const setUsersStatus = async (userIds, isBlocked) => {
+    const sql = `UPDATE ${dbName} SET "isBlocked" = $1 WHERE id in (${userIds.join(',')});`
+    await pool.query(sql, [isBlocked])
 }
 
 const deleteUsers = async (userIds) => {
@@ -39,7 +34,6 @@ export default {
     getUsers,
     getUserByMail,
     createUser,
-    blockUsers,
-    unblockUsers,
+    setUsersStatus,
     deleteUsers
 }

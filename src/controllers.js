@@ -64,15 +64,9 @@ const getUsers = async (request, response) => {
     response.status(200).json(users)
 }
 
-const blockUsers = async (request, response) => {
-    const userIds = request.body
-    await db.blockUsers(userIds)
-    response.status(200).end()
-}
-
-const unblockUsers = async (request, response) => {
-    const userIds = request.body
-    await db.unblockUsers(userIds)
+const setUsersStatus = async (request, response) => {
+    const {userIds, isBlocked} = request.body
+    await db.setUsersStatus(userIds, isBlocked)
     response.status(200).end()
 }
 
@@ -86,7 +80,6 @@ export default {
     signup,
     login,
     getUsers,
-    blockUsers,
-    unblockUsers,
+    setUsersStatus,
     deleteUsers
 }
