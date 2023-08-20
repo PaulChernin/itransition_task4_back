@@ -6,10 +6,7 @@ const secretKey = process.env.SECRET_KEY
 
 const setTokenCookie = (request, response) => {
     const token = jwt.sign(request.body.mail, secretKey)
-    response.cookie('token', token, {
-        sameSite: 'none',
-        secure: true
-    })
+    response.status(200).json({token: token})
 }
 
 const createUser = async (request) => {

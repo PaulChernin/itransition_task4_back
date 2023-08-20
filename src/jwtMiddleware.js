@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 const secretKey = process.env.SECRET_KEY
 
 const isAuthorized = async (request) => {
-    const token = request.cookies.token
+    const token = request.headers.authorization
     if (!token) return false
     const mail = jwt.verify(token, secretKey)
     const user = await db.getUserByMail(mail)
